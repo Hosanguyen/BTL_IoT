@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Điều khiển bóng đèn</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Điều khiển Bóng Đèn</h1>
+
+    <button id="relay1-on">Bật Relay 1</button>
+    <button id="relay1-off">Tắt Relay 1</button>
+
+    <button id="relay2-on">Bật Relay 2</button>
+    <button id="relay2-off">Tắt Relay 2</button>
+
+    <script>
+        // Hàm gửi yêu cầu tới backend
+        function sendCommand(relay, action) {
+            const url = relay === 1 ? 'http://localhost:5000/api/relay1' : 'http://localhost:5000/api/relay2';
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ action: action })
+            })
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch(error => console.error('Error:', error));
+        }
+
+        // Gán sự kiện cho các nút bật/tắt relay 1
+        document.getElementById("relay1-on").addEventListener("click", () => {
+            console.log("bat den 1")
+            sendCommand(1, "ON");
+        });
+
+        document.getElementById("relay1-off").addEventListener("click", () => {
+            sendCommand(1, "OFF");
+        });
+
+        // Gán sự kiện cho các nút bật/tắt relay 2
+        document.getElementById("relay2-on").addEventListener("click", () => {
+            sendCommand(2, "ON");
+        });
+
+        document.getElementById("relay2-off").addEventListener("click", () => {
+            sendCommand(2, "OFF");
+        });
+    </script>
+
+</body>
+</html>
