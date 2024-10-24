@@ -1,6 +1,10 @@
 from flask import Flask, request, jsonify
 import paho.mqtt.client as mqtt
 from flask_cors import CORS
+from dotenv import load_dotenv
+import os
+# Load từ file .env
+load_dotenv()
 
 # Tạo ứng dụng Flask
 app = Flask(__name__)
@@ -8,8 +12,9 @@ app = Flask(__name__)
 CORS(app)
 
 # Thông tin MQTT broker
-BROKER = "192.168.1.109"
-PORT = 1883
+BROKER = os.getenv('BROKER')
+PORT = int(os.getenv('BROKER_PORT'))
+
 TOPIC_RELAY1 = "home/relay1"
 TOPIC_RELAY2 = "home/relay2"
 
@@ -45,5 +50,9 @@ def control_relay2():
     else:
         return jsonify({'error': 'Hành động không hợp lệ'}), 400
 
+
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    HOST = os.getenv('HOST')
+    HOST_PORT = int(os.getenv('HOST_PORT'))
+    app.run(host=HOST, port=HOST_PORT)
