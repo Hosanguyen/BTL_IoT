@@ -4,7 +4,7 @@ import os
 
 load_dotenv()
 
-BROKER = os.getenv('BROKER')
+BROKER = os.getenv('BROKER_URL')
 PORT = int(os.getenv('BROKER_PORT'))
 
 mqtt_client = mqtt.Client()
