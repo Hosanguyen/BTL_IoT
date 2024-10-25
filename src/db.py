@@ -11,10 +11,8 @@ url = "mongodb+srv://nguyenthienhoa:12345@cluster0.jujotvv.mongodb.net/IOT?retry
 connection = MongoClient(url)
 db = connection[db_name]
 
-
 def getConnection():
     return connection
-
 
 def getDb():
     return db
