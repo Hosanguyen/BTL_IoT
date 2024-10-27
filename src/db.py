@@ -4,9 +4,9 @@ import os
 
 load_dotenv()
 
-db_name = os.getenv('DB_NAME')
+db_name = os.getenv('MONGO_DB')
 
-url = "mongodb+srv://nguyenthienhoa:12345@cluster0.jujotvv.mongodb.net/IOT?retryWrites=true&w=majority&appName=Cluster0"
+url = os.getenv('MONGO_URL')
 
 connection = MongoClient(url)
 db = connection[db_name]
