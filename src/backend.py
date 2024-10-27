@@ -3,6 +3,7 @@ import paho.mqtt.client as mqtt
 from flask_cors import CORS
 from dotenv import load_dotenv
 from Module.SmartDoor import smart_door
+from Module.FireAlarm import fire_alarm
 import os
 # Load từ file .env
 load_dotenv()
@@ -12,6 +13,7 @@ app = Flask(__name__)
 
 # Register the relay Blueprint
 app.register_blueprint(smart_door)
+app.register_blueprint(fire_alarm)
 
 CORS(app)
 
