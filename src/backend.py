@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import paho.mqtt.client as mqtt
 from flask_cors import CORS
 from dotenv import load_dotenv
+from Module.SmartDoor import smart_door
 import os
 # Load từ file .env
 load_dotenv()
@@ -9,10 +10,13 @@ load_dotenv()
 # Tạo ứng dụng Flask
 app = Flask(__name__)
 
+# Register the relay Blueprint
+app.register_blueprint(smart_door)
+
 CORS(app)
 
 # Thông tin MQTT broker
-BROKER = os.getenv('BROKER')
+BROKER = os.getenv('BROKER_URL')
 PORT = int(os.getenv('BROKER_PORT'))
 
 TOPIC_RELAY1 = "home/relay1"
@@ -49,7 +53,6 @@ def control_relay2():
         return jsonify({'status': 'Relay 2 Tắt'}), 200
     else:
         return jsonify({'error': 'Hành động không hợp lệ'}), 400
-
 
 
 if __name__ == '__main__':
