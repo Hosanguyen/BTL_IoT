@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from Module.SmartDoor import smart_door
 from Module.FireAlarm import fire_alarm
 import os
+
 # Load từ file .env
 load_dotenv()
 
@@ -28,6 +29,7 @@ TOPIC_RELAY2 = "home/relay2"
 mqtt_client = mqtt.Client()
 mqtt_client.connect(BROKER, PORT, 60)
 
+
 # Route API để điều khiển relay 1
 @app.route('/api/relay1', methods=['POST'])
 def control_relay1():
@@ -41,6 +43,7 @@ def control_relay1():
         return jsonify({'status': 'Relay 1 Tắt'}), 200
     else:
         return jsonify({'error': 'Hành động không hợp lệ'}), 400
+
 
 # Route API để điều khiển relay 2
 @app.route('/api/relay2', methods=['POST'])
