@@ -5,15 +5,13 @@ from dotenv import load_dotenv
 import os
 from src.db import getDb
 from src.model.FireAlarm import FireAlarm
-from firealarm_services import save_FireAlarm
+from src.services.firealarm_services import save_FireAlarm
 
 load_dotenv()
 
 BROKER = os.getenv('BROKER_URL')
 PORT = int(os.getenv('BROKER_PORT'))
 
-db = getDb()
-collection1 = db['FireAlarm']
 
 mqtt_client = mqtt.Client()
 def on_connect(client, userdata, flags, rc):
@@ -21,7 +19,7 @@ def on_connect(client, userdata, flags, rc):
     # thêm các topic cần subscribe ở đây
     client.subscribe("home/firealarm")
 
-def on_essage(client, userdata, msg):
+def on_message(client, userdata, msg):
     print(msg.topic+" "+str(msg.payload))
     # xử lý message ở đây
     if msg.topic == 'home/firealarm':
@@ -34,7 +32,7 @@ def on_essage(client, userdata, msg):
 
 # Kết nối tới broker
 mqtt_client.on_connect = on_connect
-mqtt_client.on_message = on_essage
+mqtt_client.on_message = on_message
 mqtt_client.connect(BROKER, PORT, 60)
 
 
