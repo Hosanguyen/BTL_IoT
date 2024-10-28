@@ -1,6 +1,6 @@
 from flask import Blueprint, request,jsonify
-from src.services.mqtt_services import getMqttClient
 from src.services.firealarm_services import getFireAlarmData
+from src.services.mqtt_services import getMqttClient
 
 mqtt_client = getMqttClient()
 fire_alarm = Blueprint('fire_alarm',__name__)
