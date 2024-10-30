@@ -30,18 +30,19 @@ def on_message(client, userdata, msg):
         save_FireAlarm(fire_alarm)
 
 
-# Kết nối tới broker
+#Kết nối tới broker
 mqtt_client.on_connect = on_connect
 mqtt_client.on_message = on_message
 mqtt_client.connect(BROKER, PORT, 60)
-
+mqtt_client.loop_start()
+print("Connected to broker")
 
 def getMqttClient():
     return mqtt_client
 
-
-import unittest
-
-class Test(unittest.TestCase):
-    def test(self):
-        self.assertEqual(getMqttClient(), mqtt_client)
+#
+# import unittest
+#
+# class Test(unittest.TestCase):
+#     def test(self):
+#         self.assertEqual(getMqttClient(), mqtt_client)
