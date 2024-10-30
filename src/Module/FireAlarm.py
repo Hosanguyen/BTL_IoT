@@ -1,11 +1,11 @@
-from flask import Blueprint, request,jsonify
+from flask import Blueprint, request, jsonify
 from src.services.firealarm_services import getFireAlarmData
 from src.services.mqtt_services import getMqttClient
 
 mqtt_client = getMqttClient()
-fire_alarm = Blueprint('fire_alarm',__name__)
+fire_alarm = Blueprint('fire_alarm', __name__)
 
-@fire_alarm.route('/api/getFireAlarm',method=['GET'])
+@fire_alarm.route('/api/getFireAlarm', methods=['GET'])
 def getFireAlarm():
     # page = request.args.get('page','Guest')
     try:
@@ -13,7 +13,7 @@ def getFireAlarm():
     except:
         return jsonify({'message': 'Lỗi không xác định'}), 500
 
-@fire_alarm.route('/api/firealarm/pump',methods=['POST'])
+@fire_alarm.route('/api/firealarm/pump', methods=['POST'])
 def control_pump():
     data = request.json
     action = data.get('action')
