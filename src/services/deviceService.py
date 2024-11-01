@@ -17,3 +17,9 @@ def addDevice(device):
 
 def deleteDevice(device_id):
     return collection.delete_one({'_id': ObjectId(device_id)})
+
+def updateState(device):
+    collection.update_one(
+        {'name': device.name},  # Tìm thiết bị theo ID
+        {'$set': {'status': device.status}}  # Cập nhật trường status
+    )
