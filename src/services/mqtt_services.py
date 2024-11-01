@@ -39,7 +39,7 @@ def init_socket(socketio):
             fire_alarm = FireAlarm(sensor_status=data.get('sensor_status',False), pump_status=data.get('pump_status',False), siren_status=data.get('siren_status',False))
             save_FireAlarm(fire_alarm)
         if(topic == 'home/light'):
-            # Gửi thông điệp qua mqtt dạng name;status ví dụ "Light1;ON"
+            # Gửi thông điệp qua mqtt dạng name;status ví dụ "Led1;ON"
             [device, action] = payload.split(";")
             led = Led(device, action, datetime.datetime.now())
             updateLightState(led)
