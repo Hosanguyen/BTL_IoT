@@ -20,6 +20,12 @@ def deleteDevice(device_id):
 
 def updateState(device):
     collection.update_one(
-        {'name': device.name},  # Tìm thiết bị theo ID
+        {'name': device.name},  # Tìm thiết bị theo name
         {'$set': {'status': device.status}}  # Cập nhật trường status
+    )
+
+def updateMode(device):
+    collection.update_one(
+        {'name': device.name},  # Tìm thiết bị theo name
+        {'$set': {'mode': device.mode}}  # Cập nhật trường mode
     )

@@ -21,10 +21,17 @@ def control():
     updateLightState(led)
     if action == 'ON':
         mqtt_client.publish(topic, mes)
-        return jsonify({'status': 'Relay 1 Bật'}), 200
+        return jsonify({'status': f'{device} Bật'}), 200
     elif action == 'OFF':
         mqtt_client.publish(topic, mes)
-        return jsonify({'status': 'Relay 1 Tắt'}), 200
+        return jsonify({'status': f'{device} Tắt'}), 200
     else:
         return jsonify({'error': 'Hành động không hợp lệ'}), 400
+
+@ControlLight.route('/api/light/auto', methods = ['POST'])
+def auto():
+    data = request.json
+    mes = data.get('message')
+    mqtt_client.publish(topic, mes)
+    return jsonify({'status': 'success'}), 200
 
