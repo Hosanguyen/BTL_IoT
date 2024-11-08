@@ -1,7 +1,7 @@
 from flask import request, session, Blueprint, jsonify
 from services.mqtt_services import mqtt_client
 from services.lightServices import updateLightState, getLightState
-from services.deviceService import getListDevice
+from services.deviceService import getListDevice, updateMode
 from model.Led import Led
 import datetime
 
@@ -32,6 +32,8 @@ def control():
 def auto():
     data = request.json
     mes = data.get('message')
+    [deviceId, mode] = mes.split(";")
+    updateMode(deviceId, mode)
     mqtt_client.publish(topic, mes)
     return jsonify({'status': 'success'}), 200
 

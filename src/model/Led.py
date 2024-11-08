@@ -1,12 +1,12 @@
 class Led():
-    def __init__(self, name, status, timestamp):
-        self.name = name
+    def __init__(self, deviceId, status, timestamp):
+        self.deviceId = deviceId
         self.status = status
         self.timestamp = timestamp
 
     def toSchema(self):
         return {
-            'name': self.name,
+            'deviceId': self.deviceId,
             'status': self.status,
             'timestamp': self.timestamp
         }

@@ -11,6 +11,7 @@ from model.FireAlarm import FireAlarm
 from services.firealarm_services import save_FireAlarm
 from model.Led import Led
 from services.lightServices import updateLightState
+from services.deviceService import updateState
 import datetime
 
 load_dotenv()
@@ -40,10 +41,10 @@ def init_socket(socketio):
             save_FireAlarm(fire_alarm)
         if(topic == 'home/light'):
             # Gửi thông điệp qua mqtt dạng name;status ví dụ "Led1;ON"
-            [device, action] = payload.split(";")
-            led = Led(device, action, datetime.datetime.now())
+            [deviceId, action] = payload.split(";")
+            led = Led(deviceId, action, datetime.datetime.now())
             updateLightState(led)
-
+            updateState(led)
             # Phát sự kiện qua SocketIO
             socketio.emit('light', payload)
 
