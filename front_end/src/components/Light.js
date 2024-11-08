@@ -15,7 +15,7 @@ const socket = io('http://localhost:5000');
 
 // Styled components
 const Lightbulb = styled(LightbulbIcon)(({ theme, status }) => ({
-    fontSize: '80px',
+    fontSize: '60px',
     color: status === 'ON' ? '#FF9800' : theme.palette.action.disabled,
     transition: 'color 0.3s',
 }));
@@ -61,7 +61,7 @@ const App = () => {
             const [name, state] = data.split(";");
             setDevices(prevDevices =>
                 prevDevices.map(device =>
-                    device.name === name ? { ...device, status: state } : device
+                    device.deviceId === name ? { ...device, status: state } : device
                 )
             );
         });
@@ -75,7 +75,7 @@ const App = () => {
         try {
             const response = await fetch(`http://localhost:5000/api/device?type=${type}`);
             const data = await response.json();
-            setDevices(data.listDevice.map(device => ({ ...device, isAuto: false })));
+            setDevices(data.listDevice.map(device => ({ ...device, isAuto: device.mode === 'auto' })));
         } catch (error) {
             console.error('Error:', error);
         }
@@ -112,10 +112,10 @@ const App = () => {
             )
         );
         if (!device.isAuto) {
-            sendAutoCommand(`${device.name};auto`);
+            sendAutoCommand(`${device.deviceId};auto`);
         } else {
         // Khi bật chế độ tự động
-            sendAutoCommand(`${device.name};manual`);
+            sendAutoCommand(`${device.deviceId};manual`);
         }
     };
 
@@ -167,7 +167,7 @@ const App = () => {
                     <Grid item xs={6} md={4} key={device._id}>
                     <DeviceCard whileHover={{ scale: 1.05 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                            <Typography variant="h6" sx={{ color: '#004d40' }}>{device.name}</Typography>
+                            <Typography variant="h6" sx={{ color: '#004d40' }}>{device.deviceId}</Typography>
                             <IconButton onClick={(event) => handleMenuOpen(event, device._id)}>
                                 <MoreHorizIcon />
                             </IconButton>
@@ -204,7 +204,7 @@ const App = () => {
                             {/* Switch thủ công ở phía dưới */}
                             <Switch
                                 checked={device.status === 'ON'}
-                                onChange={() => sendCommand(`${device.name};${device.status === 'ON' ? 'OFF' : 'ON'}`)}
+                                onChange={() => sendCommand(`${device.deviceId};${device.status === 'ON' ? 'OFF' : 'ON'}`)}
                                 disabled={device.isAuto}
                             />
                         </Box>

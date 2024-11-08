@@ -1,8 +1,10 @@
 class Device:
-    def __init__(self, name, status, mode, type):
-        self.name = name
-        self.status = status
+    def __init__(self, deviceId, topic, alive, mode, status, type):
+        self.deviceId = deviceId
+        self.topic = topic
+        self.alive = alive
         self.mode = mode
+        self.status = status
         self.type = type
         
     
@@ -11,8 +13,10 @@ class Device:
     
     def toSchema(self):
         return {
-            'name': self.name,
-            'status': self.status,
+            'deviceId': self.deviceId,
+            'topic': self.topic,
+            'alive': self.alive,
             'mode': self.mode,
+            'status': self.status,
             'type': self.type
         }
