@@ -1,5 +1,7 @@
-from src.db import getDb
-from src.model.FireAlarm import FireAlarm
+# from src.db import getDb
+# from src.model.FireAlarm import FireAlarm
+from db import getDb
+from model.FireAlarm import FireAlarm
 
 db = getDb()
 collection = db['FireAlarm']

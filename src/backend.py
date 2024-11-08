@@ -4,6 +4,12 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from Module.SmartDoor import smart_door
 from Module.FireAlarm import fire_alarm
+from Module.ControlLight import ControlLight
+from flask_socketio import SocketIO
+from services.mqtt_services import init_socket
+from services.deviceService import getListDevice, addDevice, deleteDevice
+from model.Device import Device
+from Module.DeviceAPI import DeviceAPI
 import os
 
 # Load từ file .env
@@ -11,54 +17,18 @@ load_dotenv()
 
 # Tạo ứng dụng Flask
 app = Flask(__name__)
+socketio = SocketIO(app, cors_allowed_origins='*')
 
 # Register the relay Blueprint
-app.register_blueprint(smart_door)
-app.register_blueprint(fire_alarm)
+# app.register_blueprint(smart_door)
+# app.register_blueprint(fire_alarm)
+app.register_blueprint(ControlLight)
+app.register_blueprint(DeviceAPI)
 
 CORS(app)
 
-# Thông tin MQTT broker
-BROKER = os.getenv('BROKER_URL')
-PORT = int(os.getenv('BROKER_PORT'))
 
-TOPIC_RELAY1 = "home/relay1"
-TOPIC_RELAY2 = "home/relay2"
-
-# Tạo MQTT Client
-mqtt_client = mqtt.Client()
-mqtt_client.connect(BROKER, PORT, 60)
-
-
-# Route API để điều khiển relay 1
-@app.route('/api/relay1', methods=['POST'])
-def control_relay1():
-    data = request.json
-    action = data.get('action')
-    if action == 'ON':
-        mqtt_client.publish(TOPIC_RELAY1, 'ON')
-        return jsonify({'status': 'Relay 1 Bật'}), 200
-    elif action == 'OFF':
-        mqtt_client.publish(TOPIC_RELAY1, 'OFF')
-        return jsonify({'status': 'Relay 1 Tắt'}), 200
-    else:
-        return jsonify({'error': 'Hành động không hợp lệ'}), 400
-
-
-# Route API để điều khiển relay 2
-@app.route('/api/relay2', methods=['POST'])
-def control_relay2():
-    data = request.json
-    action = data.get('action')
-    if action == 'ON':
-        mqtt_client.publish(TOPIC_RELAY2, 'ON')
-        return jsonify({'status': 'Relay 2 Bật'}), 200
-    elif action == 'OFF':
-        mqtt_client.publish(TOPIC_RELAY2, 'OFF')
-        return jsonify({'status': 'Relay 2 Tắt'}), 200
-    else:
-        return jsonify({'error': 'Hành động không hợp lệ'}), 400
-
+init_socket(socketio)
 
 if __name__ == '__main__':
     HOST = os.getenv('HOST')

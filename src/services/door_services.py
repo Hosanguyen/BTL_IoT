@@ -1,9 +1,12 @@
-from src.db import getDb
+# from src.db import getDb
+from db import getDb
 import unittest
 import datetime
 
-from src.model.Door import Door
-from src.services.mqtt_services import getMqttClient
+# from src.model.Door import Door
+# from src.services.mqtt_services import getMqttClient
+from model.Door import Door
+from services.mqtt_services import getMqttClient
 
 db = getDb()
 collection = db['log_status']
