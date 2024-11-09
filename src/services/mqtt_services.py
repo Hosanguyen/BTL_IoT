@@ -24,10 +24,11 @@ def on_message(client, userdata, msg):
     # xử lý message ở đây
     if msg.topic == 'home/firealarm':
         print('Fire alarm: ', msg.payload.decode())
-        # ghi log vào database
-        data = json.load(msg.payload.decode())
-        fire_alarm = FireAlarm(sensor_status=data.get('sensor_status',False), pump_status=data.get('pump_status',False), siren_status=data.get('siren_status',False))
-        save_FireAlarm(fire_alarm)
+    #     # ghi log vào database
+        data = json.loads(msg.payload.decode())
+        print('Fire alarm:', data)
+    #     fire_alarm = FireAlarm(sensor_status=data.get('sensor_status',False), pump_status=data.get('pump_status',False), siren_status=data.get('siren_status',False))
+    #     save_FireAlarm(fire_alarm)
 
 
 #Kết nối tới broker

@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 from Module.SmartDoor import smart_door
 from Module.FireAlarm import fire_alarm
 import os
+from model.FireAlarm import FireAlarm
+from services.firealarm_services import save_FireAlarm
+import json
 
 # Load từ file .env
 load_dotenv()
@@ -58,8 +61,7 @@ def control_relay2():
         return jsonify({'status': 'Relay 2 Tắt'}), 200
     else:
         return jsonify({'error': 'Hành động không hợp lệ'}), 400
-
-
+mqtt_client.loop_start()
 if __name__ == '__main__':
     HOST = os.getenv('HOST')
     HOST_PORT = int(os.getenv('HOST_PORT'))
