@@ -1,8 +1,11 @@
 from flask import Blueprint, request, jsonify
 
-from src.model.Door import Door
-from src.services.door_services import save_door_status, get_door_status
-from src.services.mqtt_services import getMqttClient
+# from src.model.Door import Door
+# from src.services.door_services import save_door_status, get_door_status
+# from src.services.mqtt_services import getMqttClient
+from model.Door import Door
+from services.door_services import save_door_status, get_door_status
+from services.mqtt_services import getMqttClient
 
 mqtt_client = getMqttClient()
 smart_door = Blueprint('smart_door', __name__)

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Điều khiển bóng đèn</title>
+    <title>Điều khiển thiết bị</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,53 +16,118 @@
             margin: 10px;
             cursor: pointer;
         }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Điều khiển Bóng Đèn</h1>
+    <h1>Điều khiển Thiết Bị</h1>
+    <div id="device_controls"></div>
 
-    <button id="relay1-on">Bật Relay 1</button>
-    <button id="relay1-off">Tắt Relay 1</button>
+    <h2>Đăng ký Thiết Bị Mới</h2>
+    <form id="register_device_form">
+        <input type="text" id="device_name" placeholder="Tên thiết bị" required>
+        <input type="text" id="device_type" placeholder="Loại thiết bị" required>
+        <button type="submit">Đăng ký Thiết bị</button>
+    </form>
 
-    <button id="relay2-on">Bật Relay 2</button>
-    <button id="relay2-off">Tắt Relay 2</button>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
     <script>
-        // Hàm gửi yêu cầu tới backend
-        function sendCommand(relay, action) {
-            const url = relay === 1 ? 'http://localhost:5000/api/relay1' : 'http://localhost:5000/api/relay2';
+        const socket = io('http://localhost:5000'); // URL của Flask server
+
+        // Lấy danh sách thiết bị dựa trên loại
+        function loadDevicesByType(type) {
+            fetch(`http://localhost:5000/api/device?type=${type}`)
+                .then(response => response.json())
+                .then(data => {
+                    const deviceControls = document.getElementById("device_controls");
+                    deviceControls.innerHTML = ''; // Xóa nội dung cũ
+
+                    data.listDevice.forEach(device => {
+                        const deviceDiv = document.createElement("div");
+                        deviceDiv.innerHTML = `
+                            <h3>${device.name}</h3>
+                            <button onclick="sendCommand('${device.name};ON')">Bật ${device.name}</button>
+                            <button onclick="sendCommand('${device.name};OFF')">Tắt ${device.name}</button>
+                            <button onclick="deleteDevice('${device._id}')">Xóa ${device.name}</button>
+                            <div id="${device.name}_status">${device.name}: ${device.status}</div>
+                        `;
+                        deviceControls.appendChild(deviceDiv);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Gọi hàm để lấy danh sách thiết bị với loại "Led"
+        loadDevicesByType("Led");
+
+        // Gửi yêu cầu điều khiển thiết bị đến backend
+        function sendCommand(mes) {
+            const url = 'http://localhost:5000/api/light';
             fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ action: action })
+                body: JSON.stringify({ message: mes })
             })
             .then(response => response.json())
             .then(data => console.log(data))
             .catch(error => console.error('Error:', error));
         }
 
-        // Gán sự kiện cho các nút bật/tắt relay 1
-        document.getElementById("relay1-on").addEventListener("click", () => {
-            console.log("bat den 1")
-            sendCommand(1, "ON");
+        // Lắng nghe sự kiện từ SocketIO để cập nhật trạng thái thiết bị
+        socket.on('light', function(data) {
+            const [name, state] = data.split(";");
+            const statusElement = document.getElementById(`${name}_status`);
+            if (statusElement) {
+                statusElement.innerText = `${name}: ${state}`;
+            }
         });
 
-        document.getElementById("relay1-off").addEventListener("click", () => {
-            sendCommand(1, "OFF");
+        // Xử lý sự kiện khi gửi form đăng ký thiết bị
+        document.getElementById('register_device_form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Ngăn chặn việc gửi form mặc định
+
+            const name = document.getElementById('device_name').value;
+            const type = document.getElementById('device_type').value;
+
+            fetch('http://localhost:5000/api/register/device', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ device: name, type: type })
+            })
+            .then(response => response.json())
+            .then(data => {
+                //alert(data.status); // Hiển thị thông báo thành công
+                document.getElementById('register_device_form').reset(); // Đặt lại form
+                loadDevicesByType(type); // Tải lại danh sách thiết bị nếu cần
+            })
+            .catch(error => console.error('Error:', error));
         });
 
-        // Gán sự kiện cho các nút bật/tắt relay 2
-        document.getElementById("relay2-on").addEventListener("click", () => {
-            sendCommand(2, "ON");
-        });
-
-        document.getElementById("relay2-off").addEventListener("click", () => {
-            sendCommand(2, "OFF");
-        });
+        // Hàm xóa thiết bị
+        function deleteDevice(deviceId) {
+            fetch('http://localhost:5000/api/delete/device', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: deviceId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                //alert(data.status || data.error); // Hiển thị thông báo
+                loadDevicesByType("Led"); // Tải lại danh sách thiết bị
+            })
+            .catch(error => console.error('Error:', error));
+        }
     </script>
-
 </body>
 </html>
