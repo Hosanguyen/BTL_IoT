@@ -66,8 +66,16 @@ const App = () => {
             );
         });
 
+        socket.on('log', (status) => {
+            const isAlive = status === 'True';  // Xác định trạng thái alive từ 'True' hoặc 'False'
+            setDevices(prevDevices =>
+                prevDevices.map(device => ({ ...device, alive: isAlive }))
+            );
+        });
+
         return () => {
             socket.off('light');
+            socket.off('log');
         };
     }, []);
 
@@ -188,10 +196,10 @@ const App = () => {
                         <Box sx={{ position: 'relative', display: 'flex', justifyContent: 'center', mt: 1 }}>
                             <Lightbulb status={device.status} />
                             <BlinkingBadge
-                                color={device.status !== 'dead' ? 'success' : 'grey'}
+                                color={device.alive ? 'success' : 'error'}
                                 variant="dot"
                                 overlap="circular"
-                                active={device.status !== 'dead'}
+                                active={true}
                                 sx={{
                                     position: 'absolute',
                                     top: 0,
