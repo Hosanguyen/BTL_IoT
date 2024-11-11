@@ -20,8 +20,8 @@ app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins='*')
 
 # Register the relay Blueprint
-# app.register_blueprint(smart_door)
-# app.register_blueprint(fire_alarm)
+app.register_blueprint(smart_door)
+app.register_blueprint(fire_alarm)
 app.register_blueprint(ControlLight)
 app.register_blueprint(DeviceAPI)
 

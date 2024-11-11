@@ -29,3 +29,13 @@ def updateMode(deviceId, mode):
         {'deviceId': deviceId},  # Tìm thiết bị theo name
         {'$set': {'mode': mode}}  # Cập nhật trường mode
     )
+
+def updateAlive(type, alive):
+    # collection.update_one(
+    #     {'deviceId': deviceId},
+    #     {'$set': {'alive': alive}}
+    # )
+    collection.update_many(
+        {'type': type},
+        {'$set': {'alive': alive}}
+    )
