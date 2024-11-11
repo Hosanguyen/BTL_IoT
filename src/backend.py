@@ -11,6 +11,9 @@ from services.deviceService import getListDevice, addDevice, deleteDevice
 from model.Device import Device
 from Module.DeviceAPI import DeviceAPI
 import os
+from model.FireAlarm import FireAlarm
+from services.firealarm_services import save_FireAlarm
+import json
 
 # Load từ file .env
 load_dotenv()
