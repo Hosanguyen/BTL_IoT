@@ -2,13 +2,16 @@
 # from src.model.FireAlarm import FireAlarm
 from db import getDb
 from model.FireAlarm import FireAlarm
+from bson import json_util
+import json
 
 db = getDb()
 collection = db['FireAlarm']
 print("Connected to FireAlarm database")
 
 def getFireAlarmData():
-    return collection.find({})
+    data = list(collection.find({}))
+    return json.loads(json_util.dumps(data))
 
 def save_FireAlarm(firealarm: FireAlarm):
     collection.insert_one(firealarm.get_info())
