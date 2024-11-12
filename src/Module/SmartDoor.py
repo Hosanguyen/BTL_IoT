@@ -14,8 +14,11 @@ topic_door = 'home/door'
 
 @smart_door.route('/api/door', methods=['GET'])
 def check_door_status():
-    data = get_door_status('door')
+    req = request.json
+    device = req.get('door_name')
+    data = get_door_status(device)
     stt = data['status']
+    print(stt)
     if stt == 'OPEN':
         return jsonify({'status': 'OPEN'}), 200
     elif stt == 'CLOSE':
@@ -33,7 +36,7 @@ def control_door():
     namedoor = data.get('door_name')
 
     door = Door(namedoor, action, None)
-    if action == 'OPEN':
+    if 'OPEN' in action:
         save_door_status(door)
         return jsonify({'status': 'Door open'}), 200
     elif action == 'CLOSE':
