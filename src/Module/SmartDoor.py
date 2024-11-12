@@ -4,7 +4,7 @@ from flask import Blueprint, request, jsonify
 # from src.services.door_services import save_door_status, get_door_status
 # from src.services.mqtt_services import getMqttClient
 from model.Door import Door
-from services.door_services import save_door_status, get_door_status
+from services.door_services import control_door, get_door_status
 from services.mqtt_services import getMqttClient
 
 mqtt_client = getMqttClient()
@@ -37,10 +37,10 @@ def control_door():
 
     door = Door(namedoor, action, None)
     if 'OPEN' in action:
-        save_door_status(door)
+        control_door(door)
         return jsonify({'status': 'Door open'}), 200
     elif action == 'CLOSE':
-        save_door_status(door)
+        control_door(door)
         return jsonify({'status': 'Door close'}), 200
     else:
         return jsonify({'error': 'Action invalid'}), 400
@@ -53,7 +53,7 @@ def camera_door_open():
 
     door = Door(namedoor, 'OPEN', None, True)
     if door.status == 'OPEN':
-        save_door_status(door)
+        control_door(door)
         return jsonify({'status': 'Door open'}), 200
 
     else:

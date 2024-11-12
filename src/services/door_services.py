@@ -45,10 +45,14 @@ class Test(unittest.TestCase):
         self.assertEqual(data['is_live'], 0)
 
 
+def control_door(door: Door):
+    mqtt_client.publish(topic_door, door.status)
+    save_door_status(door)
+
+
 def save_door_status(door: Door):
     timestamp = datetime.datetime.now()
     door.timestamp = timestamp
-    mqtt_client.publish(topic_door, door.status)
     data = door.get_info()
     collection.insert_one(data)
 
