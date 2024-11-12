@@ -26,6 +26,7 @@ def init_socket(socketio):
     def on_connect(client, userdata, flags, rc):
         print("Connected with result code "+str(rc))
         # thêm các topic cần subscribe ở đây
+        client.subscribe("home/door")
         client.subscribe("home/firealarm")
         client.subscribe("home/light")
 
