@@ -52,12 +52,18 @@ def init_socket(socketio):
                 preLogLed = cur
                 led = Led(deviceId, "ON", datetime.datetime.now())
                 updateLightState(led)
+                log = led.toSchema()
+                log['timestamp'] = log['timestamp'].isoformat()
+                socketio.emit('status_logs', [log])
             elif (action == 'LOGOFF'):
                 updateAlive("Led", True)
                 socketio.emit('log', 'True')
                 preLogLed = cur
                 led = Led(deviceId, "OFF", datetime.datetime.now())
                 updateLightState(led)
+                log = led.toSchema()
+                log['timestamp'] = log['timestamp'].isoformat()
+                socketio.emit('status_logs', [log])
             elif (action == 'ON' or action == 'OFF'):
                 led = Led(deviceId, action, datetime.datetime.now())
                 updateLightState(led)
