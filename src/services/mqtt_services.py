@@ -20,6 +20,7 @@ BROKER = os.getenv('BROKER_URL')
 PORT = int(os.getenv('BROKER_PORT'))
 
 preLogLed = time.time()
+preDoor = time.time()
 
 mqtt_client = mqtt.Client()
 def init_socket(socketio):
@@ -71,6 +72,7 @@ def init_socket(socketio):
                 updateState(led)
                 # Phát sự kiện qua SocketIO
                 socketio.emit('light', payload)
+            
 
     #Kết nối tới broker
     mqtt_client.on_connect = on_connect
@@ -80,12 +82,16 @@ def init_socket(socketio):
     print("Connected to broker")
     def check_timeout():
         global preLogLed
+        global preDoor
         while True:
             time.sleep(1)  # Check every 1 seconds
             cur = time.time()
             if cur - preLogLed > 10:
                 updateAlive("Led", False)
                 socketio.emit('log', 'False')
+            if cur - preDoor > 10:
+                updateAlive("Door", False)
+                socketio.emit('door', 'False')
 
     # Run the timeout check in a separate thread
     threading.Thread(target=check_timeout, daemon=True).start()
