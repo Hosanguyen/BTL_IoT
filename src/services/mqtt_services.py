@@ -21,6 +21,7 @@ PORT = int(os.getenv('BROKER_PORT'))
 
 preLogLed = time.time()
 preDoor = time.time()
+prePump = time.time()
 
 mqtt_client = mqtt.Client()
 def init_socket(socketio):
@@ -38,11 +39,17 @@ def init_socket(socketio):
         cur = time.time()
         # xử lý message ở đây
         if msg.topic == 'home/firealarm':
+            global prePump
+            prePump = cur
+            updateAlive("pump", True)
+            socketio.emit('pump', 'True')
             print('Fire alarm: ', msg.payload.decode())
             # ghi log vào database
-            data = json.load(msg.payload.decode())
-            fire_alarm = FireAlarm(sensor_status=data.get('sensor_status',False), pump_status=data.get('pump_status',False), siren_status=data.get('siren_status',False))
+            [deviceId, status, pump_status] = payload.split(";")
+            fire_alarm = FireAlarm(deviceId, status, pump_status)
             save_FireAlarm(fire_alarm)
+            # Phát sự kiện qua SocketIO
+            socketio.emit('firealarm', payload)
         if(topic == 'home/light'):
             # Gửi thông điệp qua mqtt dạng name;status ví dụ "Led1;ON"
             global preLogLed
@@ -83,6 +90,7 @@ def init_socket(socketio):
     def check_timeout():
         global preLogLed
         global preDoor
+        global prePump
         while True:
             time.sleep(1)  # Check every 1 seconds
             cur = time.time()
@@ -92,6 +100,9 @@ def init_socket(socketio):
             if cur - preDoor > 10:
                 updateAlive("Door", False)
                 socketio.emit('door', 'False')
+            if cur - prePump > 10:
+                updateAlive("pump", False)
+                socketio.emit('pump', 'False')
 
     # Run the timeout check in a separate thread
     threading.Thread(target=check_timeout, daemon=True).start()

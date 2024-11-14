@@ -1,6 +1,7 @@
 import datetime
 class FireAlarm:
-    def __init__(self, status=False, pump_status=False, siren_status=False):
+    def __init__(self,deviceId, status, pump_status):
+        self.deviceId = deviceId
         # Trạng thái cảm biến lửa (True nếu phát hiện lửa)
         self.status = status
         # Trạng thái máy bơm (True nếu máy bơm đang hoạt động)
@@ -10,6 +11,7 @@ class FireAlarm:
 
     def get_info(self):
         return {
+            'deviceId': self.deviceId,
             'status': self.status,
             'pump_status': self.pump_status,
             'timestamp': self.timestamp

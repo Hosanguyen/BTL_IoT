@@ -6,7 +6,7 @@ from bson import json_util
 import json
 
 db = getDb()
-collection = db['FireAlarm']
+collection = db['FireAlarm_Log']
 print("Connected to FireAlarm database")
 
 def getFireAlarmData():

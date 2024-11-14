@@ -10,7 +10,7 @@ url = os.getenv('MONGO_URI')
 
 connection = MongoClient(url)
 db = connection[db_name]
-
+print(url)
 
 def getConnection():
     return connection

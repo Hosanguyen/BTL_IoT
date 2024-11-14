@@ -21,6 +21,8 @@ def register_device():
         topic = 'home/light'
     if type == 'door':
         topic = 'home/door'
+    if type == 'pump':
+        topic = 'home/pump'
     status = 'OFF'
     mode = 'manual'
     device = Device(deviceId, topic, True, mode, status, type)
