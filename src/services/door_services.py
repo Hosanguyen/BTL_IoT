@@ -50,7 +50,6 @@ def control_door(door: Door):
     save_door_status(door)
 
 
-
 def save_door_status(door: Door):
     timestamp = datetime.datetime.now()
     door.timestamp = timestamp
