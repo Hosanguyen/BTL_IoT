@@ -22,42 +22,23 @@ client.connect(broker, port, 60)
 try:
     client.loop_start()  # Bắt đầu vòng lặp nền của MQTT
     while True:
-        # Giả lập dữ liệu ngẫu nhiên
-        data1 = "Led1;LOGON"
-        data2 = "Led1;LOGOFF"
-        data3 = "Led2;LOGON"
-        data4 = "Led2;LOGOFF"
+        # Tạo trạng thái ngẫu nhiên cho từng đèn
+        led1_status = random.choice(["LOGON", "LOGOFF"])
+        led2_status = random.choice(["LOGON", "LOGOFF"])
         
-        # Chuyển đổi dữ liệu sang chuỗi JSON
-        payload = str(data1)
+        # Tạo tin nhắn theo định dạng "Led1;LOGON" hoặc "Led2;LOGOFF"
+        payload_led1 = f"Led1;{led1_status}"
+        payload_led2 = f"Led2;{led2_status}"
         
-        # Gửi dữ liệu lên topic
-        client.publish(topic, payload)
-        print(f"Đã gửi: {payload}")
-        
-        # Chờ 5 giây trước khi gửi dữ liệu tiếp
-        time.sleep(5)
-        payload = str(data2)
-        
-        # Gửi dữ liệu lên topic
-        client.publish(topic, payload)
-        print(f"Đã gửi: {payload}")
+        # Gửi dữ liệu của từng đèn lên topic
+        client.publish(topic, payload_led1)
+        print(f"Đã gửi: {payload_led1}")
         
         # Chờ 5 giây trước khi gửi dữ liệu tiếp
         time.sleep(5)
-        payload = str(data3)
         
-        # Gửi dữ liệu lên topic
-        client.publish(topic, payload)
-        print(f"Đã gửi: {payload}")
-        
-        # Chờ 5 giây trước khi gửi dữ liệu tiếp
-        time.sleep(5)
-        payload = str(data4)
-        
-        # Gửi dữ liệu lên topic
-        client.publish(topic, payload)
-        print(f"Đã gửi: {payload}")
+        client.publish(topic, payload_led2)
+        print(f"Đã gửi: {payload_led2}")
         
         # Chờ 5 giây trước khi gửi dữ liệu tiếp
         time.sleep(5)
