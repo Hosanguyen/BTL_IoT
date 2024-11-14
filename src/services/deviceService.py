@@ -4,7 +4,7 @@ from bson import ObjectId
 
 db = getDb()
 
-collection = db['device']
+collection = db['Device']
 
 def getListDevice(device_type):
     devices = collection.find({'type': device_type})

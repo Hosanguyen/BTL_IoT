@@ -10,7 +10,7 @@ from services.mqtt_services import getMqttClient
 
 db = getDb()
 collection = db['log_status']
-collection_device = db['device']
+collection_device = db['Device']
 topic_door = 'home/door'
 mqtt_client = getMqttClient()
 
