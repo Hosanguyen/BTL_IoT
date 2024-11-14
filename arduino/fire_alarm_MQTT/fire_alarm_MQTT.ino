@@ -86,7 +86,7 @@ void loop() {
   client.loop();
 
   int flameDetected = digitalRead(FLAME_SENSOR_PIN);
-
+  Serial.println(flameDetected);
   if (flameDetected == LOW) {  // Flame detected
     Serial.println("Flame detected! Blinking light for 5 seconds.");
     digitalWrite(RELAY_PIN2, LOW);
