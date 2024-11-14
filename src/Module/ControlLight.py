@@ -34,6 +34,11 @@ def auto():
     mes = data.get('message')
     [deviceId, mode] = mes.split(";")
     updateMode(deviceId, mode)
+
+    led = Led(deviceId, "OFF", datetime.datetime.now())
+    mqtt_client.publish('home/light', deviceId + ";OFF")
+    updateLightState(led)
+
     mqtt_client.publish(topic, mes)
     return jsonify({'status': 'success'}), 200
 

@@ -1,6 +1,6 @@
 class Door:
-    def __init__(self, name, status, timestamp, is_open_by_camera=False, is_live=True):
-        self.name = name
+    def __init__(self, deviceId, status, timestamp, is_open_by_camera=False, is_live=True):
+        self.deviceId = deviceId
         self.status = status
         self.timestamp = timestamp
         self.is_open_by_camera = is_open_by_camera
@@ -8,7 +8,7 @@ class Door:
 
     def get_info(self):
         return {
-            'name': self.name,
+            'deviceId': self.deviceId,
             'status': self.status,
             'timestamp': self.timestamp,
             'is_open_by_camera': self.is_open_by_camera

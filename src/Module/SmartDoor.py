@@ -4,7 +4,7 @@ from flask import Blueprint, request, jsonify
 # from src.services.door_services import save_door_status, get_door_status
 # from src.services.mqtt_services import getMqttClient
 from model.Door import Door
-from services.door_services import save_door_status, get_door_status
+from services.door_services import control_door, get_door_status
 from services.mqtt_services import getMqttClient
 
 mqtt_client = getMqttClient()
@@ -14,30 +14,41 @@ topic_door = 'home/door'
 
 @smart_door.route('/api/door', methods=['GET'])
 def check_door_status():
-    data = get_door_status('door')
-    stt = data['status']
-    if stt == 'OPEN':
-        return jsonify({'status': 'OPEN'}), 200
-    elif stt == 'CLOSE':
-        return jsonify({'status': 'CLOSE'}), 200
-    elif stt == 'Door is empty':
-        return jsonify({'status': 'Door is empty'}), 300
+    req = request.json
+    deviceId = req.get('door_id')
+    data = get_door_status(deviceId)
+    print(data)
+    if not data:
+        return jsonify({'status': 'Door not found'}), 300
+    if data['alive'] == 1:
+        stt = data['status']
+        if stt == 'OPEN':
+            return jsonify({'status': 'OPEN'}), 200
+        elif stt == 'CLOSE':
+            return jsonify({'status': 'CLOSE'}), 200
+        elif stt == 'Door not found':
+            return jsonify({'status': 'Door not found'}), 300
+        else:
+            return jsonify({'error': 'Not alive'}), 404
     else:
-        return jsonify({'error': 'Door not found'}), 404
+        return jsonify({'error': 'Not alive'}), 404
 
 
 @smart_door.route('/api/door', methods=['POST'])
-def control_door():
+def dieukhien_door():
     data = request.json
     action = data.get('action')
-    namedoor = data.get('door_name')
+    namedoor = data.get('door_id')
+    data = get_door_status(namedoor)
+    if not data or data['alive'] == 0:
+        return jsonify({'status': 'Door not found'}), 300
 
     door = Door(namedoor, action, None)
-    if action == 'OPEN':
-        save_door_status(door)
+    if 'OPEN' in action:
+        control_door(door)
         return jsonify({'status': 'Door open'}), 200
     elif action == 'CLOSE':
-        save_door_status(door)
+        control_door(door)
         return jsonify({'status': 'Door close'}), 200
     else:
         return jsonify({'error': 'Action invalid'}), 400
@@ -46,11 +57,11 @@ def control_door():
 @smart_door.route('/api/camera_door', methods=['POST'])
 def camera_door_open():
     data = request.json
-    namedoor = data.get('door_name')
+    namedoor = data.get('door_id')
 
     door = Door(namedoor, 'OPEN', None, True)
     if door.status == 'OPEN':
-        save_door_status(door)
+        control_door(door)
         return jsonify({'status': 'Door open'}), 200
 
     else:

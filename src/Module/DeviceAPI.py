@@ -19,6 +19,10 @@ def register_device():
     topic =""
     if(type == 'Led'):
         topic = 'home/light'
+    if type == 'door':
+        topic = 'home/door'
+    if type == 'pump':
+        topic = 'home/pump'
     status = 'OFF'
     mode = 'manual'
     device = Device(deviceId, topic, True, mode, status, type)
@@ -28,7 +32,7 @@ def register_device():
 @DeviceAPI.route('/api/delete/device', methods=['DELETE'])
 def delete_device():
     data = request.json
-    device_id = data.get('id')
+    device_id = data.get('device_id')
     if device_id:
         result = deleteDevice(device_id)
         if result.deleted_count > 0:
