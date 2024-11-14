@@ -18,8 +18,8 @@ const int lightSensorPin = 32;  // Chân cảm biến ánh sáng
 #define RELAY_PIN2 18 
 
 const char* topicLed = "home/light"; 
-const char* mqtt_pub_topic = "fire_alarm/status";
-const char* mqtt_sub_topic = "fire_alarm/control";
+const char* mqtt_pub_topic = "home/firealarm";
+const char* mqtt_sub_topic = "home/pump";
 int pump_status = 0;
 
 WiFiClient espClient;
@@ -127,6 +127,7 @@ void reconnect() {
     if (client.connect("ESP32Client")) {
       Serial.println("Đã kết nối");
       client.subscribe(topicLed);  // Đăng ký topic chính
+      client.subscribe(mqtt_sub_topic);
     } else {
       Serial.print("Thất bại, rc=");
       Serial.print(client.state());
