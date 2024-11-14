@@ -18,9 +18,9 @@ const int lightSensorPin = 32;  // Chân cảm biến ánh sáng
 #define RELAY_PIN2 18 
 
 const char* topicLed = "home/light"; 
-const char* mqtt_pub_topic = "home/firealarm";
-const char* mqtt_sub_topic = "home/pump";
-int pump_status = 0;
+const char* mqtt_pub_topic = "fire_alarm/status";
+const char* mqtt_sub_topic = "fire_alarm/control";
+int pump_status = 1;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -107,12 +107,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
     if (message == "ON") {
       Serial.println("Turning on pump.");
       pump_status = 1;
-      digitalWrite(RELAY_PIN2, LOW);  // Turn on relay
+      // digitalWrite(RELAY_PIN2, LOW);  // Turn on relay
     } 
     else if (message == "OFF") {
       Serial.println("Turning off pump.");
       pump_status = 0;
-      digitalWrite(RELAY_PIN2, HIGH); // Turn off relay
+      // digitalWrite(RELAY_PIN2, HIGH); // Turn off relay
     }
     else {
       Serial.println("Invalid operation.");
@@ -192,13 +192,13 @@ void loop() {
   }
 
   int flameDetected = digitalRead(FLAME_SENSOR_PIN);
-
   if (flameDetected == LOW) {  // Flame detected
     Serial.println("Flame detected! Blinking light for 5 seconds.");
-    digitalWrite(RELAY_PIN2, LOW);
-
+    if(pump_status == 1) digitalWrite(RELAY_PIN2, LOW);
+    else digitalWrite(RELAY_PIN2, HIGH);
     // Publish flame detection message to MQTT
-    client.publish(mqtt_pub_topic, "Fire detected!");
+    if(pump_status == 1)client.publish(mqtt_pub_topic, "FireAlarm;YES;ON");
+    else client.publish(mqtt_pub_topic, "FireAlarm;YES;OFF");
 
     // Blink light for 5 seconds
     unsigned long startTime = millis();
@@ -219,7 +219,7 @@ void loop() {
     digitalWrite(RELAY_PIN2, HIGH);
 
     // Publish no flame message to MQTT
-    client.publish(mqtt_pub_topic, "No fire detected.");
+    client.publish(mqtt_pub_topic, "FireAlarm;NO;OFF");
   }
 
   if(current - previousLog >= delayLog){
