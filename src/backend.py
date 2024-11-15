@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from Module.SmartDoor import smart_door
 from Module.FireAlarm import fire_alarm
 from Module.ControlLight import ControlLight
+from Module.UserAPI import userAPI
 from flask_socketio import SocketIO
 from services.mqtt_services import init_socket
 from services.deviceService import getListDevice, addDevice, deleteDevice
@@ -27,6 +28,7 @@ app.register_blueprint(smart_door)
 app.register_blueprint(fire_alarm)
 app.register_blueprint(ControlLight)
 app.register_blueprint(DeviceAPI)
+app.register_blueprint(userAPI)
 
 CORS(app)
 
