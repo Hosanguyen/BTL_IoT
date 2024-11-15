@@ -9,8 +9,10 @@ const char* password = "hoanguyen";
 const char* mqtt_server = "192.168.110.81";
 
 // Chân GPIO điều khiển relay và cảm biến
+
 const int ledpin1 = 19;
 const int ledpin2 = 21;
+
 const int lightSensorPin = 32;  // Chân cảm biến ánh sáng
 
 const char* topic = "home/light";  // Topic để nhận lệnh điều khiển
@@ -142,7 +144,6 @@ void loop() {
     int lightValue = digitalRead(lightSensorPin);
     Serial.print("Giá trị ánh sáng: ");
     Serial.println(lightValue);
-
 
     // Kiểm tra giá trị ánh sáng để bật/tắt đèn
     if (lightValue == 1 && !light1Status) {  
