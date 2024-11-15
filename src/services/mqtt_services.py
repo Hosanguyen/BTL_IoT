@@ -36,7 +36,7 @@ def init_socket(socketio):
     def on_message(client, userdata, msg):
         topic = msg.topic
         payload = msg.payload.decode()
-        print(f'{topic} {payload}')
+        print(f'in on message: {topic} {payload}')
         cur = time.time()
         # xử lý message ở đây
         if msg.topic == 'home/firealarm':
