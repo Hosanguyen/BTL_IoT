@@ -42,3 +42,4 @@ def updateAlive(type, alive):
         {'type': type},
         {'$set': {'alive': alive}}
     )
+    # print(f'Update alive {type}:{alive} success')
