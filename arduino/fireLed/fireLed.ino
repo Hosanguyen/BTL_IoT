@@ -18,8 +18,8 @@ const int lightSensorPin = 32;  // Chân cảm biến ánh sáng
 #define RELAY_PIN2 18 
 
 const char* topicLed = "home/light"; 
-const char* mqtt_pub_topic = "fire_alarm/status";
-const char* mqtt_sub_topic = "fire_alarm/control";
+const char* mqtt_pub_topic = "home/firealarm";
+const char* mqtt_sub_topic = "home/pump";
 int pump_status = 1;
 
 WiFiClient espClient;
@@ -29,6 +29,7 @@ bool light1Status = false;  // Trạng thái đèn hiện tại
 bool light2Status = false;
 bool lightStatus = false;   // Biến để theo dõi trạng thái ánh sáng
 bool autoMode = false;      // Biến để theo dõi chế độ tự động
+bool autoMode2 = false;
 
 const long delayLog = 5000; // Gửi log mỗi 5 giây
 unsigned long previousLog = 0;
@@ -76,6 +77,17 @@ void callback(char* topic, byte* payload, unsigned int length) {
         client.publish(topicLed, "Led1;OFF");
       }
 
+      if (led == "Led2" && state == "auto") {
+        autoMode2 = true;
+        Serial.println("Chuyển sang chế độ tự động");
+      } else if (led == "Led2" && state == "manual") {
+        autoMode2 = false;
+        Serial.println("Chuyển sang chế độ thủ công");
+        digitalWrite(ledpin2, LOW); 
+        light2Status = false;
+        client.publish(topicLed, "Led2;OFF");
+      }
+
       // Điều khiển relay 1
       if (led == "Led1" && !autoMode) {
         if (state == "ON") {
@@ -90,7 +102,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
       }
 
       // Điều khiển relay 2
-      if (led == "Led2") {
+      if (led == "Led2" && !autoMode2) {
         if (state == "ON") {
           digitalWrite(ledpin2, HIGH);
           light2Status = true;
@@ -112,7 +124,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     else if (message == "OFF") {
       Serial.println("Turning off pump.");
       pump_status = 0;
-      // digitalWrite(RELAY_PIN2, HIGH); // Turn off relay
+      digitalWrite(RELAY_PIN2, HIGH); // Turn off relay
     }
     else {
       Serial.println("Invalid operation.");
@@ -168,32 +180,41 @@ void loop() {
   // Nếu đang ở chế độ tự động, đọc dữ liệu từ cảm biến ánh sáng
   if (autoMode) {
     int lightValue = digitalRead(lightSensorPin);
-    Serial.print("Giá trị ánh sáng: ");
-    Serial.println(lightValue);
 
     // Kiểm tra giá trị ánh sáng để bật/tắt đèn
     if (lightValue == 1 && !light1Status) {  
       digitalWrite(ledpin1, HIGH);
-      // digitalWrite(ledpin2, HIGH);    // Bật đèn
       light1Status = true;
-      // light2Status = true;
       client.publish(topicLed, "Led1;ON");  // Gửi trạng thái ON tới MQTT
-      // client.publish(topic, "Led2;ON");  // Gửi trạng thái ON tới MQTT
       Serial.println("Đèn bật do ánh sáng yếu");
     } else if (lightValue == 0 && light1Status) {
       digitalWrite(ledpin1, LOW); 
-      // digitalWrite(ledpin2, LOW);    // Tắt đèn
       light1Status = false;
-      // light2Status = false;
       client.publish(topicLed, "Led1;OFF"); // Gửi trạng thái OFF của led 1 tới MQTT
-      // client.publish(topic, "Led2;OFF"); // Gửi trạng thái OFF của led 2 tới MQTT
+      Serial.println("Đèn tắt do ánh sáng đủ");
+    }
+  }
+
+  if (autoMode2) {
+    int lightValue = digitalRead(lightSensorPin);
+
+    // Kiểm tra giá trị ánh sáng để bật/tắt đèn
+    if (lightValue == 1 && !light2Status) {  
+      digitalWrite(ledpin2, HIGH);
+      light2Status = true;
+      client.publish(topicLed, "Led2;ON");  
+      Serial.println("Đèn bật do ánh sáng yếu");
+    } else if (lightValue == 0 && light2Status) {
+      digitalWrite(ledpin2, LOW); 
+      light2Status = false;
+      client.publish(topicLed, "Led2;OFF"); 
       Serial.println("Đèn tắt do ánh sáng đủ");
     }
   }
 
   int flameDetected = digitalRead(FLAME_SENSOR_PIN);
   if (flameDetected == LOW) {  // Flame detected
-    Serial.println("Flame detected! Blinking light for 5 seconds.");
+    // Serial.println("Flame detected! Blinking light for 5 seconds.");
     if(pump_status == 1) digitalWrite(RELAY_PIN2, LOW);
     else digitalWrite(RELAY_PIN2, HIGH);
     // Publish flame detection message to MQTT
@@ -214,12 +235,12 @@ void loop() {
       }
     }
   } else {
-    Serial.println("No flame detected. Light is off.");
+    // Serial.println("No flame detected. Light is off.");
     digitalWrite(RELAY_PIN, HIGH);
     digitalWrite(RELAY_PIN2, HIGH);
 
     // Publish no flame message to MQTT
-    client.publish(mqtt_pub_topic, "FireAlarm;NO;OFF");
+    // client.publish(mqtt_pub_topic, "FireAlarm;NO;OFF");
   }
 
   if(current - previousLog >= delayLog){
@@ -235,6 +256,12 @@ void loop() {
     }
     else {
       client.publish(topicLed, "Led2;LOGOFF");
+    }
+    if(flameDetected == LOW){
+      if(pump_status == 1)client.publish(mqtt_pub_topic, "FireAlarm;YES;ON");
+      else client.publish(mqtt_pub_topic, "FireAlarm;YES;OFF");
+    } else {
+      client.publish(mqtt_pub_topic, "FireAlarm;NO;OFF");
     }
   }
 

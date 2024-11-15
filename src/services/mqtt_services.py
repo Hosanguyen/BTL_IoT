@@ -92,7 +92,7 @@ def init_socket(socketio):
         global preDoor
         global prePump
         while True:
-            time.sleep(1)  # Check every 1 seconds
+              # Check every 1 seconds
             cur = time.time()
             if cur - preLogLed > 10:
                 updateAlive("Led", False)
@@ -103,7 +103,7 @@ def init_socket(socketio):
             if cur - prePump > 10:
                 updateAlive("pump", False)
                 socketio.emit('pump', 'False')
-
+            time.sleep(10)
     # Run the timeout check in a separate thread
     threading.Thread(target=check_timeout, daemon=True).start()
 
