@@ -14,37 +14,6 @@ collection_device = db['Device']
 topic_door = 'home/door'
 mqtt_client = getMqttClient()
 
-
-# class Test(unittest.TestCase):
-#     def test(self):
-#         self.assertEqual(getDb(), db)
-#         self.assertEqual(collection_log, db['Door_Log'])
-
-#     def test_function(self):
-#         # door = Door('door', 'OPEN', datetime.datetime.now())
-#         # save_door_status(door)
-#         # data = get_door_status('door')
-#         # self.assertEqual(data['name'], 'door')
-#         # self.assertEqual(data['status'], 'OPEN')
-#         # self.assertEqual(data['timestamp'], data['timestamp'])
-
-#         door = Door('door', 'CLOSE', datetime.datetime.now())
-#         save_door_status(door)
-#         data = get_door_status('door')
-#         self.assertEqual(data['name'], 'door')
-#         self.assertEqual(data['status'], 'CLOSE')
-#         self.assertEqual(data['timestamp'], data['timestamp'])
-
-#     def test_set_door_alive(self):
-#         set_door_alive(1)
-#         data = collection_device.find_one({'device': 'door'})
-#         self.assertEqual(data['is_live'], 1)
-
-#         set_door_alive(0)
-#         data = collection_device.find_one({'device': 'door'})
-#         self.assertEqual(data['is_live'], 0)
-
-
 def control_door(door: Door):
     mqtt_client.publish(topic_door, door.deviceId+";"+door.status)
     save_door_status(door)
@@ -62,7 +31,6 @@ def save_door_status(door: Door):
 
 
 def get_door_status(device_id):
-    print(device_id)
     data = collection_device.find_one({'deviceId': device_id})
     return data
 

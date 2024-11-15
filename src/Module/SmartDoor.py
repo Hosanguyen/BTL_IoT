@@ -49,8 +49,6 @@ def dieukhien_door():
     action = data.get('action')
     namedoor = data.get('door_id')
     data_status = get_door_status(namedoor)
-    # print("in dieukhien_door" + data)
-    print(data_status['alive'])
     if not data or data_status['alive'] == 0:
         print("in dieukhien_door" + namedoor)
         return jsonify({'status': 'Door not found'}), 300
@@ -67,20 +65,6 @@ def dieukhien_door():
         return jsonify({'status': 'Door stop'}), 200
     else:
         return jsonify({'error': 'Action invalid'}), 400
-
-
-# @smart_door.route('/api/camera_door', methods=['POST'])
-# def camera_door_open():
-#     data = request.json
-#     namedoor = data.get('door_id')
-
-#     door = Door(namedoor, 'OPEN', None, True)
-#     if door.status == 'OPEN':
-#         control_door(door)
-#         return jsonify({'status': 'Door open'}), 200
-
-#     else:
-#         return jsonify({'error': 'Action invalid'}), 400
 
 @smart_door.route('/api/camera_door', methods=['POST'])
 def camera_door_open():
