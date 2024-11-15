@@ -26,7 +26,7 @@ def init_door_socket(socket):
 def check_door_status():
     deviceId = request.args.get('door_id')
     data = get_door_status(deviceId)
-    print(data)
+    print("in check door status" + data)
     if not data:
         return jsonify({'status': 'Door not found'}), 300
     if data['alive'] == 1:
@@ -48,8 +48,11 @@ def dieukhien_door():
     data = request.json
     action = data.get('action')
     namedoor = data.get('door_id')
-    data = get_door_status(namedoor)
-    if not data or data['alive'] == 0:
+    data_status = get_door_status(namedoor)
+    # print("in dieukhien_door" + data)
+    print(data_status['alive'])
+    if not data or data_status['alive'] == 0:
+        print("in dieukhien_door" + namedoor)
         return jsonify({'status': 'Door not found'}), 300
 
     door = Door(namedoor, action, None)

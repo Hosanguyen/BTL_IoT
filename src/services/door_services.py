@@ -53,7 +53,6 @@ def control_door(door: Door):
 def save_door_status(door: Door):
     timestamp = datetime.datetime.now()
     door.timestamp = timestamp
-    mqtt_client.publish(topic_door, door.status)
     data = door.get_info()
     collection_device.update_one(
         {'deviceId': door.deviceId},  # Tìm thiết bị theo name
