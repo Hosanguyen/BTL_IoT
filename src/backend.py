@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 import paho.mqtt.client as mqtt
 from flask_cors import CORS
 from dotenv import load_dotenv
-from Module.SmartDoor import smart_door
+from Module.SmartDoor import smart_door, init_door_socket
 from Module.FireAlarm import fire_alarm
 from Module.ControlLight import ControlLight
 from Module.UserAPI import userAPI
@@ -14,13 +14,14 @@ from Module.DeviceAPI import DeviceAPI
 import os
 from model.FireAlarm import FireAlarm
 from services.firealarm_services import save_FireAlarm
+
 import json
 
 # Load từ file .env
 load_dotenv()
 
 # Tạo ứng dụng Flask
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='/static')
 socketio = SocketIO(app, cors_allowed_origins='*')
 
 # Register the relay Blueprint
@@ -34,6 +35,7 @@ CORS(app)
 
 
 init_socket(socketio)
+init_door_socket(socketio)
 
 if __name__ == '__main__':
     HOST = os.getenv('HOST')

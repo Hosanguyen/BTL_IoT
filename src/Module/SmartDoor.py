@@ -6,16 +6,25 @@ from flask import Blueprint, request, jsonify
 from model.Door import Door
 from services.door_services import control_door, get_door_status
 from services.mqtt_services import getMqttClient
-
+from services.recognition_services import RecognitionService
+from db import getDb
 mqtt_client = getMqttClient()
 smart_door = Blueprint('smart_door', __name__)
 topic_door = 'home/door'
 
+# Thêm biến để lưu trữ socketio instance
+socketio = None
+database = getDb()
+recognition_service = RecognitionService(database=database)
+
+def init_door_socket(socket):
+    global socketio
+    socketio = socket
+
 
 @smart_door.route('/api/door', methods=['GET'])
 def check_door_status():
-    req = request.json
-    deviceId = req.get('door_id')
+    deviceId = request.args.get('door_id')
     data = get_door_status(deviceId)
     print(data)
     if not data:
@@ -50,19 +59,74 @@ def dieukhien_door():
     elif action == 'CLOSE':
         control_door(door)
         return jsonify({'status': 'Door close'}), 200
+    elif action == 'STOP':
+        control_door(door)
+        return jsonify({'status': 'Door stop'}), 200
     else:
         return jsonify({'error': 'Action invalid'}), 400
 
+
+# @smart_door.route('/api/camera_door', methods=['POST'])
+# def camera_door_open():
+#     data = request.json
+#     namedoor = data.get('door_id')
+
+#     door = Door(namedoor, 'OPEN', None, True)
+#     if door.status == 'OPEN':
+#         control_door(door)
+#         return jsonify({'status': 'Door open'}), 200
+
+#     else:
+#         return jsonify({'error': 'Action invalid'}), 400
 
 @smart_door.route('/api/camera_door', methods=['POST'])
 def camera_door_open():
-    data = request.json
-    namedoor = data.get('door_id')
+    try:
+        data = request.json
+        namedoor = data.get('door_id')
+        user_id = data.get('user_id')
+        image_data = data.get('image')  # Nhận base64 image từ client AI
+        
+        # Kiểm tra trạng thái cửa
+        door_data = get_door_status(namedoor)
+        if not door_data or door_data['alive'] == 0:
+            return jsonify({'status': 'Door not found'}), 300
 
-    door = Door(namedoor, 'OPEN', None, True)
-    if door.status == 'OPEN':
+        # Lưu thông tin nhận diện và lấy record với URL
+        recognition_record = recognition_service.save_recognition(namedoor, image_data, user_id)
+        
+        # Gửi thông tin nhận diện tới frontend qua socket.io
+        if socketio:
+            socketio.emit('door_recognition', recognition_record)
+
+        # Mở cửa
+        door = Door(namedoor, 'OPEN', None, True)
         control_door(door)
-        return jsonify({'status': 'Door open'}), 200
+        return jsonify({
+            'status': 'Door open',
+            'recognition': recognition_record
+        }), 200
 
-    else:
-        return jsonify({'error': 'Action invalid'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@smart_door.route('/api/recognitions', methods=['GET'])
+def get_recognitions():
+    try:
+        door_id = request.args.get('door_id')
+        limit = int(request.args.get('limit', 10))
+        records = recognition_service.get_recognitions(door_id, limit)
+        return jsonify(records), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@smart_door.route('/api/recognitions/<recognition_id>', methods=['GET'])
+def get_recognition(recognition_id):
+    try:
+        record = recognition_service.get_recognition_by_id(recognition_id)
+        if record:
+            return jsonify(record), 200
+        return jsonify({'error': 'Recognition not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
