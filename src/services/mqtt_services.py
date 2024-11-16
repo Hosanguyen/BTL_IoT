@@ -36,7 +36,7 @@ def init_socket(socketio):
     def on_message(client, userdata, msg):
         topic = msg.topic
         payload = msg.payload.decode()
-        # print(f'in on message: {topic} {payload}')
+        print(f'in on message: {topic} {payload}')
         cur = time.time()
         # xử lý message ở đây
         if msg.topic == 'home/firealarm':
@@ -153,9 +153,9 @@ def init_socket(socketio):
             if cur - preLogLed > 10:
                 updateAlive("Led", False)
                 socketio.emit('log', 'False')
-            if cur - preDoor > 100:
-                updateAlive("door", False)
-                socketio.emit('dooralive', 'False')
+            # if cur - preDoor > 100:
+            #     updateAlive("door", False)
+            #     socketio.emit('dooralive', 'False')
             if cur - prePump > 10:
                 updateAlive("pump", False)
                 socketio.emit('pump', 'False')
