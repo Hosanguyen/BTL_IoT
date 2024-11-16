@@ -6,7 +6,7 @@ userAPI = Blueprint('userAPI', __name__)
 @userAPI.route('/api/user/signup', methods=['POST'])
 def signup():
     data = request.json
-    user = User(username=data.get('username'),password=data.get('password'), name=data.get('name'))
+    user = User(username=data.get('username'),password=data.get('password'), name=data.get('name'),role=data.get('role'))
     if add_user(user):
         return jsonify({'status': 'Tạo tài khoản thành công'}), 200
     else:
@@ -43,8 +43,9 @@ def updateUser():
 def updateImageUser():
     data = request.json
     _id = data.get('_id')
-    image = data.get('image')
-    update_image(_id, image)
+    image1 = data.get('image1')
+    image2 = data.get('image2')
+    update_image(_id, image1, image2)
     return jsonify({'status': 'Cập nhật ảnh thành công'}), 200
 
 @userAPI.route('/api/user/delete', methods=['DELETE'])
