@@ -45,7 +45,9 @@ def updateImageUser():
     _id = data.get('_id')
     image1 = data.get('image1')
     image2 = data.get('image2')
-    update_image(_id, image1, image2)
+    idImage1 = data.get('idImage1')
+    idImage2 = data.get('idImage2')
+    update_image(_id, image1, image2, idImage1, idImage2)
     return jsonify({'status': 'Cập nhật ảnh thành công'}), 200
 
 @userAPI.route('/api/user/delete', methods=['DELETE'])

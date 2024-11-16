@@ -33,10 +33,10 @@ def update_user(_id, name , password):
         {'$set': {'password': password, 'name': name}}
     )
 
-def update_image(_id, image1, image2):
+def update_image(_id, image1, image2,idImage1,idImage2):
     collection_user.update_one(
         {'_id': ObjectId(_id)},
-        {'$set': {'image1': image1,'image2': image2}}
+        {'$set': {'image1': image1,'image2': image2,'idImage1': idImage1,'idImage2': idImage2}}
     )
 
 def delete_user(_id):
