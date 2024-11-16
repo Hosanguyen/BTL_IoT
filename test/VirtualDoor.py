@@ -6,6 +6,7 @@ class DoorStatus:
     LOGCLOSE = "LOGCLOSE"
     LOGOPENING = "LOGOPENING"
     LOGCLOSING = "LOGCLOSING"
+    LOGSTOP = "LOGSTOP"
 
 class DoorAction:
     OPEN = "OPEN"
@@ -73,12 +74,12 @@ class SmartDoor:
             self.current_action = DoorAction.OPEN
             self.status = DoorStatus.LOGOPENING
             self.movement_start_time = time.time()
-            if self.position % 5 == 0:
+            if self.position % 2 == 0:
                 self.client.publish("home/door", f"{self.device_id};{DoorStatus.LOGOPENING}")
             # self.client.publish("home/door", f"{self.device_id};{DoorStatus.LOGOPENING}")
-            print(f"Door is opening... Position: {self.position}")
-            print(f"Current status: {self.status}")
-            print(f"Current action in handle_open: {self.current_action}")
+            # print(f"Door is opening... Position: {self.position}")
+            # print(f"Current status: {self.status}")
+            # print(f"Current action in handle_open: {self.current_action}")
         else:
             self.current_action = None
             self.status = DoorStatus.LOGOPEN
@@ -95,7 +96,7 @@ class SmartDoor:
             self.movement_start_time = time.time()
             if self.position % 5 == 0:
                 self.client.publish("home/door", f"{self.device_id};{DoorStatus.LOGCLOSING}")
-            print(f"Door is closing... Position: {self.position}")
+            # print(f"Door is closing... Position: {self.position}")
         else:
             self.current_action = None
             self.status = DoorStatus.LOGCLOSE
@@ -108,12 +109,16 @@ class SmartDoor:
             self.is_moving = False
             # Update status based on current position
             self.current_action = None
-            if self.position > 0:
+            if self.position == 10:
                 self.status = DoorStatus.LOGOPEN
                 self.client.publish("home/door", f"{self.device_id};{DoorStatus.LOGOPEN}")
-            else:
+            elif self.position == 0:
                 self.status = DoorStatus.LOGCLOSE
                 self.client.publish("home/door", f"{self.device_id};{DoorStatus.LOGCLOSE}")
+            else:
+                self.status = DoorStatus.LOGSTOP
+                self.client.publish("home/door", f"{self.device_id};{DoorStatus.LOGSTOP}")
+
 
     # def update_position(self):
     #     """Update door position based on elapsed time"""
@@ -154,9 +159,9 @@ class SmartDoor:
                 # Cập nhật vị trí cửa
                 if self.current_action in [DoorAction.OPEN, DoorAction.CLOSE]:
                     self.is_moving = True
-                print(f"Current position: {self.position}")
-                print(f"Current status: {self.status}")
-                print(f"Current action: {self.current_action}")
+                # print(f"Current position: {self.position}")
+                # print(f"Current status: {self.status}")
+                # print(f"Current action: {self.current_action}")
                 if self.current_action == DoorAction.OPEN:
                     print("1")
                     self.handle_open()
