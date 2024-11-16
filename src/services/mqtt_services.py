@@ -36,7 +36,7 @@ def init_socket(socketio):
     def on_message(client, userdata, msg):
         topic = msg.topic
         payload = msg.payload.decode()
-        print(f'in on message: {topic} {payload}')
+        # print(f'in on message: {topic} {payload}')
         cur = time.time()
         # xử lý message ở đây
         if msg.topic == 'home/firealarm':
@@ -115,6 +115,14 @@ def init_socket(socketio):
                 socketio.emit('dooralive', 'True')
                 # Phát sự kiện qua SocketIO
                 socketio.emit('door', payload)
+            elif action == 'LOGSTOP':
+                updateAlive("door", True)
+                preDoor = cur
+                door = Door(deviceId, "STOP", datetime.datetime.now())
+                updateState(door)
+                socketio.emit('dooralive', 'True')
+                # Phát sự kiện qua SocketIO
+                socketio.emit('door', payload)
             # elif action == 'OPEN' or action == 'CLOSE':
             #     try:
             #         updateAlive("door", True)
@@ -145,7 +153,7 @@ def init_socket(socketio):
             if cur - preLogLed > 10:
                 updateAlive("Led", False)
                 socketio.emit('log', 'False')
-            if cur - preDoor > 10:
+            if cur - preDoor > 100:
                 updateAlive("door", False)
                 socketio.emit('dooralive', 'False')
             if cur - prePump > 10:
