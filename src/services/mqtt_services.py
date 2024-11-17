@@ -11,7 +11,7 @@ from model.FireAlarm import FireAlarm
 from services.firealarm_services import save_FireAlarm
 from model.Led import Led
 from model.Door import Door
-from services.lightServices import updateLightState
+from services.lightServices import updateLightState, getLog
 from services.deviceService import updateState, updateAlive
 import datetime, time
 import threading
@@ -163,7 +163,11 @@ def init_socket(socketio):
 
     # Run the timeout check in a separate thread
     threading.Thread(target=check_timeout, daemon=True).start()
-
+    @socketio.on('status')
+    def handle_connect():
+        print('Client connected')
+        logs = getLog("Led1")  +  getLog("Led2")
+        socketio.emit('status_logs', logs)
 
 def getMqttClient():
     return mqtt_client
