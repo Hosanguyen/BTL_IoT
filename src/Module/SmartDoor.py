@@ -105,7 +105,8 @@ def get_recognitions():
     try:
         door_id = request.args.get('door_id')
         limit = int(request.args.get('limit', 10))
-        records = recognition_service.get_recognitions(door_id, limit)
+        page = int(request.args.get('page', 1))
+        records = recognition_service.get_recognitions(door_id, limit,page)
         return jsonify(records), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500

@@ -28,7 +28,7 @@ client.loop_start()
 
 dem=0
 while True:
-    time.sleep(5)
+    time.sleep(1)
     print("Publishing message..." + str(dem))
     print(f"FireAlarm;YES;{status}")
     # print("FireAlarm;YES;OFF")
