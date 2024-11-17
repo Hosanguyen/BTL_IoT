@@ -51,20 +51,27 @@ class RecognitionService:
             print(f"Error saving recognition: {str(e)}")
             raise e
 
-    def get_recognitions(self, door_id=None, limit=10):
+    def get_recognitions(self, door_id=None, limit=10,page=1):
         try:
             # Tạo query filter
             query = {'door_id': door_id} if door_id else {}
-            
+            skip = (page - 1) * limit
+            total_document = self.recognition_collection.count_documents(query)
+            total_page = (total_document//limit) + (1 if total_document % limit > 0 else 0)
             # Lấy records từ MongoDB
             cursor = self.recognition_collection.find(query)\
                 .sort('timestamp', DESCENDING)\
-                .limit(limit)
+                .limit(limit).skip(skip)
+            
+            
             
             # Chuyển đổi sang list các dict
             records = [Recognition.from_dict(record).to_dict() for record in cursor]
             
-            return records
+            return {
+                'total_page': total_page,
+                'records': records
+            }
             
         except Exception as e:
             print(f"Error getting recognitions: {str(e)}")
